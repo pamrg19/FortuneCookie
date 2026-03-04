@@ -91,6 +91,29 @@ button:active {
   background-color: #45a049;
 }
 
+#link-input {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+#add-link {
+  padding: 10px 20px;
+  background-color: #4f7e80;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#add-link:hover {
+  background-color: #45a049;
+}
+
+
+
 /* === IMAGES === */
 img {
   max-width: 100%;
@@ -124,4 +147,5 @@ img {
     width: 100%;
   }
 }
+
 
