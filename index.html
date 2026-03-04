@@ -18,7 +18,7 @@
     <button id="add-phrase">Send to the universe</button>
   </div>
   
-  <button id="reset-phrases">Reset All Phrases</button>
+ <!--<button id="reset-phrases">Reset All Phrases</button>-->
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -44,21 +44,35 @@
 
     let phrases = [];
 
+    
+
     // Array of image URLs (these stay in code, not Firebase)
     const images = [
       "https://images.metmuseum.org/CRDImages/ep/original/DP-41223-001.jpg",
       "https://images.metmuseum.org/CRDImages/ep/original/DP346475.jpg",
       "https://images.metmuseum.org/CRDImages/ep/original/DP-17161-001.jpg",
-      "https://images.metmuseum.org/CRDImages/ep/original/DT7098.jpg"
+      "https://images.metmuseum.org/CRDImages/ep/original/DT7098.jpg",
+      "https://images.metmuseum.org/CRDImages/ep/original/DP-19451-001.jpg"
     ];
 
     // Default phrases
     const defaultPhrases = [
       ""You honestly expect me to believe that people go on vacations without making a spreadsheet of fun first?" Phoebe asked. - The Wedding People",
       "I just mean, a story can be beautiful not because of the way it ends. But because of the way it's written. - The Wedding People",
-      "Somos las albaceas de su memoria. - Dime quien soy",
       "Don't work the system. Outsmart it. - Lessons in Chemistry",
+      "You should watch The Bear S2.E7",
+      "You should watch Frieren",
+      "You should watch The Office S5.E14 cold open"
       "Justo antes de quedarse dormida, se dio cuenta de que era verdad: había conseguido todo lo que quería. Sin embargo, lamentaba no haber deseado algo más. - La Biblioteca de Paris"
+    ];
+
+    // Array of fun links
+    const links = [
+      "https://youtu.be/dQw4w9WgXcQ?si=bMGIr7IjRD_fg1pr&t=7",
+      "https://museum.unesco.org/",
+      "https://www.littlevintagephotobooth.com/",
+      "https://theuselessweb.com/",
+      "https://neal.fun/",
     ];
 
     // Load phrases from Firebase
@@ -74,27 +88,46 @@
       }
     });
 
-    // Show random phrase OR image
-    document.getElementById('surprise').addEventListener('click', () => {
-      const display = document.getElementById('display');
-      
-      // 50% chance phrase, 50% chance image
-      if (Math.random() < 0.5 && phrases.length > 0) {
+    // ═══════════════════════════════════════════════════
+    // SURPRISE BUTTON - Shows random phrase/image/link
+    // ═══════════════════════════════════════════════════
+
+
+    // Show random phrase OR image OR link
+document.getElementById('surprise').addEventListener('click', () => {
+  const display = document.getElementById('display');
+  const random = Math.random();
+  
+  // 33% phrase, 33% image, 33% link
+      if (random < 0.33 && phrases.length > 0) {
         // Show random phrase
         const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
         display.innerHTML = `<p>${randomPhrase}</p>`;
-      } else {
+        
+      } else if (random < 0.66) {
         // Show random image
         const randomImage = images[Math.floor(Math.random() * images.length)];
         display.innerHTML = `<img src="${randomImage}" alt="Random Art" style="max-width: 100%; border-radius: 8px;">`;
+        
+      } else if (links.length > 0) {
+        // Show random link
+        const randomLink = links[Math.floor(Math.random() * links.length)];
+        
+        // For YouTube videos - show embedded player
+        if (randomLink.includes('youtube.com') || randomLink.includes('youtu.be')) {
+          const videoId = randomLink.split('v=')[1]?.split('&')[0] || randomLink.split('/').pop();
+          display.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+        } else {
+          // Regular link
+          display.innerHTML = `<a href="${randomLink}" target="_blank" style="color: #ff6b9d; font-size: 1.2rem; text-decoration: underline;">✨ Click for surprise! ✨</a>`;
+        }
       }
-      
-      // Animation
-      display.style.transform = 'scale(1.05)';
-      setTimeout(() => {
-        display.style.transform = 'scale(1)';
-      }, 200);
-    });
+  // Animation
+  display.style.transform = 'scale(1.05)';
+  setTimeout(() => {
+    display.style.transform = 'scale(1)';
+  }, 200);
+});
 
     // Add new phrase
     document.getElementById('add-phrase').addEventListener('click', function() {
@@ -136,3 +169,4 @@
   </script>
 </body>
 </html>
+
