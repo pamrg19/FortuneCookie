@@ -18,12 +18,15 @@
     <button id="add-phrase">Send to the universe</button>
   </div>
   
- <!--<button id="reset-phrases">Reset All Phrases</button>-->
+  <div class="input-section">
+    <input type="url" id="link-input" placeholder="Add a fun link (YouTube, Spotify, etc.)">
+    <button id="add-link">Add Link</button>
+  </div>
 
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+    import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
     // Your Firebase configuration
     const firebaseConfig = {
@@ -41,18 +44,21 @@
     const app = initializeApp(firebaseConfig);
     const database = getDatabase(app);
     const phrasesRef = ref(database, 'phrases');
+    const linksRef = ref(database, 'links');
 
     let phrases = [];
+    let links = [];
 
-    
-
-    // Array of image URLs (these stay in code, not Firebase)
+    // Array of image URLs
     const images = [
       "https://images.metmuseum.org/CRDImages/ep/original/DP-41223-001.jpg",
       "https://images.metmuseum.org/CRDImages/ep/original/DP346475.jpg",
       "https://images.metmuseum.org/CRDImages/ep/original/DP-17161-001.jpg",
       "https://images.metmuseum.org/CRDImages/ep/original/DT7098.jpg",
-      "https://images.metmuseum.org/CRDImages/ep/original/DP-19451-001.jpg"
+      "https://images.metmuseum.org/CRDImages/ep/original/DP-19451-001.jpg",
+      "https://science.nasa.gov/wp-content/uploads/2024/05/hubble-hptau-wfc3-1-flat-finalok.jpg",
+      "https://science.nasa.gov/wp-content/uploads/2023/07/41156165560-4438592e93-o.jpg"
+      
     ];
 
     // Default phrases
@@ -66,68 +72,77 @@
       "Justo antes de quedarse dormida, se dio cuenta de que era verdad: había conseguido todo lo que quería. Sin embargo, lamentaba no haber deseado algo más. - La Biblioteca de Paris"
     ];
 
-    // Array of fun links
-    const links = [
+    // Default links
+    const defaultLinks = [
       "https://youtu.be/dQw4w9WgXcQ?si=bMGIr7IjRD_fg1pr&t=7",
       "https://museum.unesco.org/",
       "https://www.littlevintagephotobooth.com/",
       "https://theuselessweb.com/",
       "https://neal.fun/",
+      "https://imagine.gsfc.nasa.gov/hst_bday/"
     ];
 
     // Load phrases from Firebase
     onValue(phrasesRef, (snapshot) => {
       if (snapshot.exists()) {
         phrases = snapshot.val();
-        console.log('✅ Phrases loaded from Firebase:', phrases.length);
+        console.log('✅ Phrases loaded:', phrases.length);
       } else {
-        // If no phrases exist, use defaults
         phrases = defaultPhrases;
         set(phrasesRef, phrases);
-        console.log('📝 Default phrases saved to Firebase');
       }
     });
 
-    // ═══════════════════════════════════════════════════
-    // SURPRISE BUTTON - Shows random phrase/image/link
-    // ═══════════════════════════════════════════════════
+    // Load links from Firebase
+    onValue(linksRef, (snapshot) => {
+      if (snapshot.exists()) {
+        links = snapshot.val();
+        console.log('✅ Links loaded:', links.length);
+      } else {
+        links = defaultLinks;
+        set(linksRef, links);
+      }
+    });
 
-
-    // Show random phrase OR image OR link
-document.getElementById('surprise').addEventListener('click', () => {
-  const display = document.getElementById('display');
-  const random = Math.random();
-  
-  // 33% phrase, 33% image, 33% link
+    // SURPRISE BUTTON
+    document.getElementById('surprise').addEventListener('click', () => {
+      const display = document.getElementById('display');
+      const random = Math.random();
+      
       if (random < 0.33 && phrases.length > 0) {
-        // Show random phrase
         const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
         display.innerHTML = `<p>${randomPhrase}</p>`;
         
       } else if (random < 0.66) {
-        // Show random image
         const randomImage = images[Math.floor(Math.random() * images.length)];
         display.innerHTML = `<img src="${randomImage}" alt="Random Art" style="max-width: 100%; border-radius: 8px;">`;
         
       } else if (links.length > 0) {
-        // Show random link
         const randomLink = links[Math.floor(Math.random() * links.length)];
         
-        // For YouTube videos - show embedded player
         if (randomLink.includes('youtube.com') || randomLink.includes('youtu.be')) {
-          const videoId = randomLink.split('v=')[1]?.split('&')[0] || randomLink.split('/').pop();
+          let videoId = randomLink.split('v=')[1];
+          if (videoId) {
+            videoId = videoId.split('&')[0];
+          } else {
+            videoId = randomLink.split('/').pop().split('?')[0];
+          }
           display.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
+        } else if (randomLink.includes('spotify.com')) {
+          // Spotify embed
+          const spotifyId = randomLink.split('/').slice(-1)[0].split('?')[0];
+          const type = randomLink.includes('/track/') ? 'track' : randomLink.includes('/playlist/') ? 'playlist' : 'album';
+          display.innerHTML = `<iframe style="border-radius:12px" src="https://open.spotify.com/embed/${type}/${spotifyId}" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-play"></iframe>`;
         } else {
-          // Regular link
           display.innerHTML = `<a href="${randomLink}" target="_blank" style="color: #ff6b9d; font-size: 1.2rem; text-decoration: underline;">✨ Click for surprise! ✨</a>`;
         }
       }
-  // Animation
-  display.style.transform = 'scale(1.05)';
-  setTimeout(() => {
-    display.style.transform = 'scale(1)';
-  }, 200);
-});
+      
+      display.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        display.style.transform = 'scale(1)';
+      }, 200);
+    });
 
     // Add new phrase
     document.getElementById('add-phrase').addEventListener('click', function() {
@@ -135,43 +150,78 @@ document.getElementById('surprise').addEventListener('click', () => {
       
       if (newPhrase !== '') {
         phrases.push(newPhrase);
-        
-        // Save to Firebase
         set(phrasesRef, phrases).then(() => {
           document.getElementById('phrase-input').value = '';
           document.getElementById('display').innerHTML = '<p>✨ Revelation sent to the universe! ✨</p>';
-          console.log('💫 Phrase added! Total:', phrases.length);
-        }).catch((error) => {
-          console.error('❌ Error saving phrase:', error);
-          alert('Oops! Could not save to Firebase. Check console.');
         });
       } else {
         alert('Please write a revelation first! ✨');
       }
     });
 
-    // Reset phrases
-    /*
-    document.getElementById('reset-phrases').addEventListener('click', function() {
-      if (confirm('Reset to default revelations?')) {
-        set(phrasesRef, defaultPhrases).then(() => {
-          document.getElementById('display').innerHTML = '<p>Revelations reset! ✨</p>';
-          console.log('🔄 Phrases reset to defaults');
-        });
+    // Add new link (WITH DOMAIN WHITELIST)
+    document.getElementById('add-link').addEventListener('click', function() {
+      const newLink = document.getElementById('link-input').value.trim();
+      
+      if (!newLink) {
+        alert('Please enter a link! 🔗');
+        return;
       }
-    });*/
-
-    // Allow Enter key to add phrase
-    document.getElementById('phrase-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('add-phrase').click();
+      
+      if (!newLink.startsWith('http://') && !newLink.startsWith('https://')) {
+        alert('Link must start with http:// or https://');
+        return;
+      }
+      
+      // Allowed domains (whitelist)
+      const allowedDomains = [
+        'youtube.com',
+        'spotify.com',
+        'open.spotify.com',
+        'instagram.com',
+        'tiktok.com',
+        'reddit.com',
+        'wikipedia.org',
+        'nasa.gov',
+        'metmuseum.org',
+        'museum.unesco.org',
+        'neal.fun',
+        'theuselessweb.com',
+        'littlevintagephotobooth.com',
+        'archive.org',
+        'vimeo.com',
+        'https://science.nasa.gov',
+        'soundcloud.com',
+        'twitter.com',
+        'x.com'
+      ];
+      
+      // Check if link is from allowed domain
+      const isAllowed = allowedDomains.some(domain => newLink.includes(domain));
+      
+      if (isAllowed) {
+        links.push(newLink);
+        
+        set(linksRef, links).then(() => {
+          document.getElementById('link-input').value = '';
+          document.getElementById('display').innerHTML = '<p>🔗 Link added! 🔗</p>';
+          console.log('🔗 Link added! Total:', links.length);
+        });
+      } else {
+        alert('❌ Only links from approved sites allowed!\n\n✅ Approved:\nYouTube, Spotify, Instagram, TikTok, Reddit, Wikipedia, NASA, Museums, and more!\n\nTry a link from one of these sites! ✨');
       }
     });
+
+    // Enter key support
+    document.getElementById('phrase-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') document.getElementById('add-phrase').click();
+    });
+    
+    document.getElementById('link-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') document.getElementById('add-link').click();
+    });
+
+    console.log('🎉 Everything loaded!');
   </script>
 </body>
 </html>
-
-
-
-
-
