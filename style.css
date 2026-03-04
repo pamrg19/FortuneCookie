@@ -97,6 +97,11 @@ img {
   border-radius: 8px;
 }
 
+#display {
+  transition: transform 0.2s ease;
+}
+
+
 /* === MOBILE RESPONSIVE === */
 @media screen and (max-width: 480px) {
   body {
@@ -119,3 +124,4 @@ img {
     width: 100%;
   }
 }
+
