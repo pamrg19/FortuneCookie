@@ -11,16 +11,128 @@
     <h1>︵‿︵‿୨♡୧‿︵‿︵</h1>
     <div id="display">I have a revelation for you</div>
     <button id="surprise">Ta da!</button> 
-    
   </div>
   
   <div class="input-section">
     <input type="text" id="phrase-input" placeholder="Add your own revelation...">
     <button id="add-phrase">Send to the universe</button>
   </div>
+  
+  <button id="reset-phrases">Reset All Phrases</button>
 
-  <!--<button id="reset-phrases">Reset All Phrases</button>-->
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-  <script src="script.js"></script>
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyBTeNwxgCYUPNCkw-QLFV4H4zcln46VAvQ",
+      authDomain: "revelation-69e14.firebaseapp.com",
+      databaseURL: "https://revelation-69e14-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "revelation-69e14",
+      storageBucket: "revelation-69e14.firebasestorage.app",
+      messagingSenderId: "106882814085",
+      appId: "1:106882814085:web:9c5a52b1a5a8c76bb099ec",
+      measurementId: "G-HBJSF7Y29H"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const phrasesRef = ref(database, 'phrases');
+
+    let phrases = [];
+
+    // Array of image URLs (these stay in code, not Firebase)
+    const images = [
+      "https://images.metmuseum.org/CRDImages/ep/original/DP-41223-001.jpg",
+      "https://images.metmuseum.org/CRDImages/ep/original/DP346475.jpg",
+      "https://images.metmuseum.org/CRDImages/ep/original/DP-17161-001.jpg",
+      "https://images.metmuseum.org/CRDImages/ep/original/DT7098.jpg"
+    ];
+
+    // Default phrases
+    const defaultPhrases = [
+      ""You honestly expect me to believe that people go on vacations without making a spreadsheet of fun first?" Phoebe asked. - The Wedding People",
+      "I just mean, a story can be beautiful not because of the way it ends. But because of the way it's written. - The Wedding People",
+      "Somos las albaceas de su memoria. - Dime quien soy",
+      "Don't work the system. Outsmart it. - Lessons in Chemistry",
+      "Justo antes de quedarse dormida, se dio cuenta de que era verdad: había conseguido todo lo que quería. Sin embargo, lamentaba no haber deseado algo más. - La Biblioteca de Paris"
+    ];
+
+    // Load phrases from Firebase
+    onValue(phrasesRef, (snapshot) => {
+      if (snapshot.exists()) {
+        phrases = snapshot.val();
+        console.log('✅ Phrases loaded from Firebase:', phrases.length);
+      } else {
+        // If no phrases exist, use defaults
+        phrases = defaultPhrases;
+        set(phrasesRef, phrases);
+        console.log('📝 Default phrases saved to Firebase');
+      }
+    });
+
+    // Show random phrase OR image
+    document.getElementById('surprise').addEventListener('click', () => {
+      const display = document.getElementById('display');
+      
+      // 50% chance phrase, 50% chance image
+      if (Math.random() < 0.5 && phrases.length > 0) {
+        // Show random phrase
+        const randomPhrase = phrases[Math.floor(Math.random() * phrases.length)];
+        display.innerHTML = `<p>${randomPhrase}</p>`;
+      } else {
+        // Show random image
+        const randomImage = images[Math.floor(Math.random() * images.length)];
+        display.innerHTML = `<img src="${randomImage}" alt="Random Art" style="max-width: 100%; border-radius: 8px;">`;
+      }
+      
+      // Animation
+      display.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        display.style.transform = 'scale(1)';
+      }, 200);
+    });
+
+    // Add new phrase
+    document.getElementById('add-phrase').addEventListener('click', function() {
+      const newPhrase = document.getElementById('phrase-input').value.trim();
+      
+      if (newPhrase !== '') {
+        phrases.push(newPhrase);
+        
+        // Save to Firebase
+        set(phrasesRef, phrases).then(() => {
+          document.getElementById('phrase-input').value = '';
+          document.getElementById('display').innerHTML = '<p>✨ Revelation sent to the universe! ✨</p>';
+          console.log('💫 Phrase added! Total:', phrases.length);
+        }).catch((error) => {
+          console.error('❌ Error saving phrase:', error);
+          alert('Oops! Could not save to Firebase. Check console.');
+        });
+      } else {
+        alert('Please write a revelation first! ✨');
+      }
+    });
+
+    // Reset phrases
+    document.getElementById('reset-phrases').addEventListener('click', function() {
+      if (confirm('Reset to default revelations?')) {
+        set(phrasesRef, defaultPhrases).then(() => {
+          document.getElementById('display').innerHTML = '<p>Revelations reset! ✨</p>';
+          console.log('🔄 Phrases reset to defaults');
+        });
+      }
+    });
+
+    // Allow Enter key to add phrase
+    document.getElementById('phrase-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        document.getElementById('add-phrase').click();
+      }
+    });
+  </script>
 </body>
 </html>
