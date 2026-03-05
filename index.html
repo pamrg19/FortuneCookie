@@ -24,158 +24,175 @@
   </div>
 
   <!-- Firebase SDK -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-    import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-    // Your Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyBTeNwxgCYUPNCkw-QLFV4H4zcln46VAvQ",
-      authDomain: "revelation-69e14.firebaseapp.com",
-      databaseURL: "https://revelation-69e14-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "revelation-69e14",
-      storageBucket: "revelation-69e14.firebasestorage.app",
-      messagingSenderId: "106882814085",
-      appId: "1:106882814085:web:9c5a52b1a5a8c76bb099ec",
-      measurementId: "G-HBJSF7Y29H"
-    };
+  // Your Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyBTeNwxgCYUPNCkw-QLFV4H4zcln46VAvQ",
+    authDomain: "revelation-69e14.firebaseapp.com",
+    databaseURL: "https://revelation-69e14-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "revelation-69e14",
+    storageBucket: "revelation-69e14.firebasestorage.app",
+    messagingSenderId: "106882814085",
+    appId: "1:106882814085:web:9c5a52b1a5a8c76bb099ec",
+    measurementId: "G-HBJSF7Y29H"
+  };
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const database = getDatabase(app);
-    const phrasesRef = ref(database, 'phrases');
-    const linksRef = ref(database, 'links');
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+  const phrasesRef = ref(database, 'phrases');
+  const linksRef = ref(database, 'links');
 
-    let phrases = [];
-    let links = [];
+  let phrases = [];
+  let links = [];
 
-    // Track last shown item to avoid repeats
-    let lastShown = { type: null, content: null };
+  // Track last shown item to avoid repeats
+  let lastShown = { type: null, content: null };
 
-    // Array of image URLs
-    const images = [
-      "https://images.metmuseum.org/CRDImages/ep/original/DP-41223-001.jpg",
-      "https://images.metmuseum.org/CRDImages/ep/original/DP346475.jpg",
-      "https://images.metmuseum.org/CRDImages/ep/original/DP-17161-001.jpg",
-      "https://images.metmuseum.org/CRDImages/ep/original/DT7098.jpg",
-      "https://images.metmuseum.org/CRDImages/ep/original/DP-19451-001.jpg",
-      "https://science.nasa.gov/wp-content/uploads/2024/05/hubble-hptau-wfc3-1-flat-finalok.jpg",
-      "https://science.nasa.gov/wp-content/uploads/2023/07/41156165560-4438592e93-o.jpg"
-      
-    ];
+  // Array of image URLs
+  const images = [
+    "https://images.metmuseum.org/CRDImages/ep/original/DP-41223-001.jpg",
+    "https://images.metmuseum.org/CRDImages/ep/original/DP346475.jpg",
+    "https://images.metmuseum.org/CRDImages/ep/original/DP-17161-001.jpg",
+    "https://images.metmuseum.org/CRDImages/ep/original/DT7098.jpg",
+    "https://images.metmuseum.org/CRDImages/ep/original/DP-19451-001.jpg",
+    "https://science.nasa.gov/wp-content/uploads/2024/05/hubble-hptau-wfc3-1-flat-finalok.jpg",
+    "https://science.nasa.gov/wp-content/uploads/2023/07/41156165560-4438592e93-o.jpg"
+  ];
 
-    // Default phrases
-    const defaultPhrases = [
-      "You honestly expect me to believe that people go on vacations without making a spreadsheet of fun first? - The Wedding People",
-      "I just mean, a story can be beautiful not because of the way it ends. But because of the way it's written. - The Wedding People",
-      "Don't work the system. Outsmart it. - Lessons in Chemistry",
-      "You should watch The Bear S2.E7",
-      "You should watch Frieren",
-      "You should watch The Office S5.E14 cold open",
-      "Justo antes de quedarse dormida, se dio cuenta de que era verdad: había conseguido todo lo que quería. Sin embargo, lamentaba no haber deseado algo más. - La Biblioteca de Paris"
-    ];
+  // Default phrases
+  const defaultPhrases = [
+    "You honestly expect me to believe that people go on vacations without making a spreadsheet of fun first? - The Wedding People",
+    "I just mean, a story can be beautiful not because of the way it ends. But because of the way it's written. - The Wedding People",
+    "Don't work the system. Outsmart it. - Lessons in Chemistry",
+    "You should watch The Bear S2.E7",
+    "You should watch Frieren",
+    "You should watch The Office S5.E14 cold open",
+    "Justo antes de quedarse dormida, se dio cuenta de que era verdad: había conseguido todo lo que quería. Sin embargo, lamentaba no haber deseado algo más. - La Biblioteca de Paris"
+  ];
 
-    // Default links
-    const defaultLinks = [
-      "https://youtu.be/dQw4w9WgXcQ?si=bMGIr7IjRD_fg1pr&t=7",
-      "https://museum.unesco.org/",
-      "https://www.littlevintagephotobooth.com/",
-      "https://theuselessweb.com/",
-      "https://neal.fun/",
-      "https://imagine.gsfc.nasa.gov/hst_bday/"
-    ];
+  // Default links
+  const defaultLinks = [
+    "https://youtu.be/dQw4w9WgXcQ?si=bMGIr7IjRD_fg1pr&t=7",
+    "https://museum.unesco.org/",
+    "https://www.littlevintagephotobooth.com/",
+    "https://theuselessweb.com/",
+    "https://neal.fun/",
+    "https://imagine.gsfc.nasa.gov/hst_bday/"
+  ];
 
-    // Load phrases from Firebase
-    onValue(phrasesRef, (snapshot) => {
-      if (snapshot.exists()) {
-        phrases = snapshot.val();
-        console.log('✅ Phrases loaded:', phrases.length);
-      } else {
-        phrases = defaultPhrases;
-        set(phrasesRef, phrases);
-      }
-    });
+  // Load phrases from Firebase
+  onValue(phrasesRef, (snapshot) => {
+    if (snapshot.exists()) {
+      phrases = snapshot.val();
+      console.log('✅ Phrases loaded:', phrases.length, phrases);
+    } else {
+      phrases = defaultPhrases;
+      set(phrasesRef, phrases);
+      console.log('📝 Saved default phrases');
+    }
+  });
 
-    // Load links from Firebase
-    onValue(linksRef, (snapshot) => {
-      if (snapshot.exists()) {
-        links = snapshot.val();
-        console.log('✅ Links loaded:', links.length);
-      } else {
-        links = defaultLinks;
-        set(linksRef, links);
-      }
-    });
+  // Load links from Firebase
+  onValue(linksRef, (snapshot) => {
+    if (snapshot.exists()) {
+      links = snapshot.val();
+      console.log('✅ Links loaded:', links.length, links);
+    } else {
+      links = defaultLinks;
+      set(linksRef, links);
+      console.log('📝 Saved default links');
+    }
+  });
 
-    // SURPRISE BUTTON
-    document.getElementById('surprise').addEventListener('click', () => {
-      const display = document.getElementById('display');
+  // SURPRISE BUTTON - FIXED VERSION
+  document.getElementById('surprise').addEventListener('click', () => {
+    const display = document.getElementById('display');
 
-      //Create pool of all available content
-      const contentPool = [];
+    console.log('🎲 Button clicked!');
+    console.log('Data check - Phrases:', phrases.length, 'Images:', images.length, 'Links:', links.length);
 
-      phrases.forEach(phrase =>{
-        contentPool.push({type: 'phrase', content: phrase});
-      });
+    // Create pool of all available content
+    const contentPool = [];
 
-      images.forEach(image =>{
-        contentPool.push({type: 'image', content: images});
-      });
+    // Add phrases
+    for (let i = 0; i < phrases.length; i++) {
+      contentPool.push({type: 'phrase', content: phrases[i]});
+    }
 
-      links.forEach(link =>{
-        contentPool.push({type: 'link', content: links});
-      });
+    // Add images
+    for (let i = 0; i < images.length; i++) {
+      contentPool.push({type: 'image', content: images[i]});
+    }
 
-      //Filter out the last shown item
-      let availableContent = contentPool.filter(item =>
-        item.type !== lastShown.type || item.content !== lastShown.content
-      );
+    // Add links
+    for (let i = 0; i < links.length; i++) {
+      contentPool.push({type: 'link', content: links[i]});
+    }
 
-      //If we filtered everything (shouldnt happen), use full pool
-      if(availableContent.length === 0){
-        availableContent = contentPool;
-      }
+    console.log('📦 Content pool created with', contentPool.length, 'items');
 
-      /// Pick random item from available content
+    if (contentPool.length === 0) {
+      display.innerHTML = '<p>⏳ Loading... Try again in a moment!</p>';
+      return;
+    }
+
+    // Filter out the last shown item
+    let availableContent = contentPool.filter(item =>
+      item.type !== lastShown.type || item.content !== lastShown.content
+    );
+
+    // If we filtered everything, use full pool
+    if (availableContent.length === 0) {
+      availableContent = contentPool;
+    }
+
+    // Pick random item
     const randomItem = availableContent[Math.floor(Math.random() * availableContent.length)];
+    
+    console.log('🎯 Selected:', randomItem.type);
     
     // Update last shown
     lastShown = randomItem;
     
     // Display based on type
     if (randomItem.type === 'phrase') {
-      display.innerHTML = `<p>${randomItem.content}</p>`;
-      console.log('📝 Showing phrase');
+      display.innerHTML = '<p>' + randomItem.content + '</p>';
+      console.log('📝 Phrase shown');
       
     } else if (randomItem.type === 'image') {
-      display.innerHTML = `<img src="${randomItem.content}" alt="Random Art" style="max-width: 100%; border-radius: 8px;">`;
-      console.log('🖼️ Showing image');
+      display.innerHTML = '<img src="' + randomItem.content + '" alt="Random Art" style="max-width: 100%; border-radius: 8px;">';
+      console.log('🖼️ Image shown:', randomItem.content);
       
     } else if (randomItem.type === 'link') {
       const link = randomItem.content;
+      console.log('🔗 Link shown:', link);
       
       // YouTube embed
       if (link.includes('youtube.com') || link.includes('youtu.be')) {
-        let videoId = link.split('v=')[1];
-        if (videoId) {
-          videoId = videoId.split('&')[0];
+        let videoId = '';
+        if (link.includes('v=')) {
+          videoId = link.split('v=')[1].split('&')[0];
         } else {
           videoId = link.split('/').pop().split('?')[0];
         }
-        display.innerHTML = `<iframe width="100%" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>`;
-        console.log('🎥 Showing YouTube video');
+        display.innerHTML = '<iframe width="100%" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe>';
+        console.log('🎥 YouTube embedded');
         
       // Spotify embed
       } else if (link.includes('spotify.com')) {
         const spotifyId = link.split('/').slice(-1)[0].split('?')[0];
         const type = link.includes('/track/') ? 'track' : link.includes('/playlist/') ? 'playlist' : 'album';
-        display.innerHTML = `<iframe style="border-radius:12px" src="https://open.spotify.com/embed/${type}/${spotifyId}" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>`;
-        console.log('🎵 Showing Spotify');
+        display.innerHTML = '<iframe style="border-radius:12px" src="https://open.spotify.com/embed/' + type + '/' + spotifyId + '" width="100%" height="152" frameborder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>';
+        console.log('🎵 Spotify embedded');
         
       // Regular link
       } else {
-        display.innerHTML = `<a href="${link}" target="_blank" style="color: #ff6b9d; font-size: 1.2rem; text-decoration: underline;">✨ Click for surprise! ✨</a>`;
-        console.log('🔗 Showing link');
+        display.innerHTML = '<a href="' + link + '" target="_blank" style="color: #ff6b9d; font-size: 1.2rem; text-decoration: underline;">✨ Click for surprise! ✨</a>';
+        console.log('🔗 Regular link displayed');
       }
     }
     
@@ -184,90 +201,77 @@
     setTimeout(() => {
       display.style.transform = 'scale(1)';
     }, 200);
-    
-    // Log statistics
-    console.log(`📊 Content pool: ${phrases.length} phrases, ${images.length} images, ${links.length} links (${contentPool.length} total)`);
   });
 
-    // Add new phrase
-    document.getElementById('add-phrase').addEventListener('click', function() {
-      const newPhrase = document.getElementById('phrase-input').value.trim();
-      
-      if (newPhrase !== '') {
-        phrases.push(newPhrase);
-        set(phrasesRef, phrases).then(() => {
-          document.getElementById('phrase-input').value = '';
-          document.getElementById('display').innerHTML = '<p>✨ Revelation sent to the universe! ✨</p>';
-        });
-      } else {
-        alert('Please write a revelation first! ✨');
-      }
-    });
-
-    // Add new link (WITH DOMAIN WHITELIST)
-    document.getElementById('add-link').addEventListener('click', function() {
-      const newLink = document.getElementById('link-input').value.trim();
-      
-      if (!newLink) {
-        alert('Please enter a link! 🔗');
-        return;
-      }
-      
-      if (!newLink.startsWith('http://') && !newLink.startsWith('https://')) {
-        alert('Link must start with http:// or https://');
-        return;
-      }
-      
-      // Allowed domains (whitelist)
-      const allowedDomains = [
-        'youtube.com',
-        'spotify.com',
-        'open.spotify.com',
-        'instagram.com',
-        'tiktok.com',
-        'reddit.com',
-        'wikipedia.org',
-        'nasa.gov',
-        'metmuseum.org',
-        'museum.unesco.org',
-        'neal.fun',
-        'theuselessweb.com',
-        'littlevintagephotobooth.com',
-        'archive.org',
-        'vimeo.com',
-        'https://science.nasa.gov',
-        'soundcloud.com',
-        'twitter.com',
-        'x.com'
-      ];
-      
-      // Check if link is from allowed domain
-      const isAllowed = allowedDomains.some(domain => newLink.includes(domain));
-      
-      if (isAllowed) {
-        links.push(newLink);
-        
-        set(linksRef, links).then(() => {
-          document.getElementById('link-input').value = '';
-          document.getElementById('display').innerHTML = '<p>🔗 Link added! 🔗</p>';
-          console.log('🔗 Link added! Total:', links.length);
-        });
-      } else {
-        alert('❌ Only links from approved sites allowed!\n\n✅ Approved:\nYouTube, Spotify, Instagram, TikTok, Reddit, Wikipedia, NASA, Museums, and more!\n\nTry a link from one of these sites! ✨');
-      }
-    });
-
-    // Enter key support
-    document.getElementById('phrase-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') document.getElementById('add-phrase').click();
-    });
+  // Add new phrase
+  document.getElementById('add-phrase').addEventListener('click', function() {
+    const newPhrase = document.getElementById('phrase-input').value.trim();
     
-    document.getElementById('link-input').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') document.getElementById('add-link').click();
-    });
+    if (newPhrase !== '') {
+      phrases.push(newPhrase);
+      set(phrasesRef, phrases).then(() => {
+        document.getElementById('phrase-input').value = '';
+        document.getElementById('display').innerHTML = '<p>✨ Revelation sent to the universe! ✨</p>';
+        console.log('💫 Phrase added! Total:', phrases.length);
+      });
+    } else {
+      alert('Please write a revelation first! ✨');
+    }
+  });
 
-    console.log('🎉 Everything loaded!');
-  </script>
+  // Add new link
+  document.getElementById('add-link').addEventListener('click', function() {
+    const newLink = document.getElementById('link-input').value.trim();
+    
+    if (!newLink) {
+      alert('Please enter a link! 🔗');
+      return;
+    }
+    
+    if (!newLink.startsWith('http://') && !newLink.startsWith('https://')) {
+      alert('Link must start with http:// or https://');
+      return;
+    }
+    
+    // Allowed domains
+    const allowedDomains = [
+      'youtube.com', 'youtu.be',
+      'spotify.com', 'open.spotify.com',
+      'instagram.com', 'tiktok.com',
+      'reddit.com', 'wikipedia.org',
+      'nasa.gov', 'science.nasa.gov', 'imagine.gsfc.nasa.gov',
+      'metmuseum.org', 'museum.unesco.org',
+      'neal.fun', 'theuselessweb.com', 'littlevintagephotobooth.com',
+      'archive.org', 'vimeo.com', 'soundcloud.com',
+      'twitter.com', 'x.com'
+    ];
+    
+    const isAllowed = allowedDomains.some(domain => newLink.includes(domain));
+    
+    if (isAllowed) {
+      links.push(newLink);
+      set(linksRef, links).then(() => {
+        document.getElementById('link-input').value = '';
+        document.getElementById('display').innerHTML = '<p>🔗 Link added! 🔗</p>';
+        console.log('🔗 Link added! Total:', links.length);
+      });
+    } else {
+      alert('❌ Only links from approved sites allowed!\n\n✅ Approved:\nYouTube, Spotify, Instagram, TikTok, Reddit, Wikipedia, NASA, Museums, and more!');
+    }
+  });
+
+  // Enter key support
+  document.getElementById('phrase-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('add-phrase').click();
+  });
+  
+  document.getElementById('link-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') document.getElementById('add-link').click();
+  });
+
+  console.log('🎉 App loaded!');
+</script>
 </body>
 </html>
+
 
