@@ -25,6 +25,8 @@
 
   <!-- TEST BUTTON -->
   <button id="test" style="background: red; color: white; padding: 10px;">🔍 TEST LINKS</button>
+  <!-- Add this button after your test button -->
+<button id="force-links" style="background: green; color: white; padding: 10px;">💚 FORCE CREATE LINKS</button>
 
   <!-- Firebase SDK -->
   <script type="module">
@@ -249,6 +251,7 @@
         alert('❌ Only links from approved sites!');
       }
     });
+    
 
     // Enter keys
     document.getElementById('phrase-input').addEventListener('keypress', function(e) {
@@ -258,8 +261,26 @@
     document.getElementById('link-input').addEventListener('keypress', function(e) {
       if (e.key === 'Enter') document.getElementById('add-link').click();
     });
+  // FORCE CREATE LINKS BUTTON
+document.getElementById('force-links').addEventListener('click', () => {
+  const testLinks = [
+    "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "https://museum.unesco.org/",
+    "https://neal.fun/"
+  ];
+  
+  set(linksRef, testLinks).then(() => {
+    alert('✅ Links force-created in Firebase! Reload the page.');
+    console.log('Links saved:', testLinks);
+  }).catch((error) => {
+    alert('❌ Error: ' + error.message);
+    console.error('Error:', error);
+  });
+});
+    
 
     console.log('🎉 App loaded!');
   </script>
 </body>
 </html>
+
